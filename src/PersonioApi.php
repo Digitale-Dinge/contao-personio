@@ -25,18 +25,18 @@ class PersonioApi
 
     public function postApplicationDocument(string $filepath): array
     {
-        return $this->doRequest('POST', 'recruiting/applications/documents', ['body' => ['file' => fopen($filepath, 'r')]])->toArray();
+        return $this->request('POST', 'recruiting/applications/documents', ['body' => ['file' => fopen($filepath, 'r')]])->toArray();
     }
 
     public function postApplication(array $data): void
     {
-        $this->doRequest('POST', 'recruiting/applications', ['json' => $data]);
+        $this->request('POST', 'recruiting/applications', ['json' => $data]);
     }
 
-    private function doRequest(string $method, string $url, array $options = []): ResponseInterface
+    public function request(string $method, string $url, array $options = []): ResponseInterface
     {
         $limiter = $this->personioApiRateLimiterFactory->create(md5($url));
-        $limiter->consume()->wait();
+        $limiter->reserve()->wait();
 
         try {
             $response = $this->personioAuthenticatedApiClient->request($method, $url, $options);
