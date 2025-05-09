@@ -1,0 +1,28 @@
+services:
+    _defaults:
+        autoconfigure: true
+        autowire: true
+        bind:
+            $personioAuthenticatedApiClient: '@contao_personio.personio_authenticated_api_client'
+            $projectDir: '%kernel.project_dir%'
+            $personioApiRateLimiterFactory: '@contao_personio.rate_limit.personio_api_factory'
+
+    InspiredMinds\ContaoPersonio\:
+        resource: ../src
+        exclude: ../src/{ContaoManager,DependencyInjection,Entity,Message,ContaoPersonioBundle.php}
+
+    contao_personio.personio_authenticated_api_client:
+        class: Symfony\Contracts\HttpClient\HttpClientInteface
+        factory: '@InspiredMinds\ContaoPersonio\HttpClient\PersonioAuthenticatedApiClientFactory'
+
+    contao_personio.rate_limit.personio_api_storage:
+        class: Symfony\Component\RateLimiter\Storage\CacheStorage
+        arguments:
+            - '@cache.rate_limiter'
+
+    contao_personio.rate_limit.personio_api_factory:
+        class: Symfony\Component\RateLimiter\RateLimiterFactory
+        arguments:
+            - { id: contao_personio.personio_api, policy: fixed_window, limit: 20, interval: 1 minute }
+            - '@contao_personio.rate_limit.personio_api_storage'
+            - '@?lock_factory'

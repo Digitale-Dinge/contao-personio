@@ -1,0 +1,19 @@
+<?php $this->extend('block_searchable'); ?>
+
+<?php $this->block('content'); ?>
+  <div class="job job--detail">
+    <h1 class="name"><?= $this->name ?></h1>
+    <p class="info"><?= $this->trans('MSC.createdOn') ?> <?= $this->date ?></p>
+    <div class="employmentType"><?= $this->trans($this->employmentType, [], 'personio') ?></div>
+    <div class="schedule"><?= $this->trans($this->schedule, [], 'personio') ?></div>
+    <div class="office"><?= $this->office ?></div>
+    <?php if ($jobDescriptions = $this->job->getDescriptions()): ?>
+      <div class="jobDescriptions">
+        <?php foreach ($jobDescriptions as $jobDescription): ?>
+          <h2 class="jobDescription__name"><?= $jobDescription->name ?></h2>
+          <div class="jobDescription__content"><?= trim($jobDescription->value) ?></div>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
+  </div>
+<?php $this->endblock(); ?>
