@@ -36,7 +36,7 @@
         "symfony/serializer": "^5.4 || ^6.4 || ^7.1",
         "codefog/contao-haste": "^5.2",
         "terminal42/contao-fineuploader": "^3.4",
-        "symfony/filesystem": "^5.4 || ^6.4 || ^7.1",
+        "symfony/filesystem": "^5.4 || ^6.4 || ^7.1"
     },
     "autoload": {
         "psr-4": {
