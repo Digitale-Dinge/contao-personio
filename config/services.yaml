@@ -2,14 +2,19 @@ services:
     _defaults:
         autoconfigure: true
         autowire: true
-        bind:
-            $personioAuthenticatedApiClient: '@contao_personio.personio_authenticated_api_client'
-            $projectDir: '%kernel.project_dir%'
-            $personioApiRateLimiterFactory: '@contao_personio.rate_limit.personio_api_factory'
 
     InspiredMinds\ContaoPersonio\:
         resource: ../src
         exclude: ../src/{ContaoManager,DependencyInjection,Entity,Message,ContaoPersonioBundle.php}
+
+    InspiredMinds\ContaoPersonio\PersonioApi:
+        arguments:
+            $personioAuthenticatedApiClient: '@contao_personio.personio_authenticated_api_client'
+            $personioApiRateLimiterFactory: '@contao_personio.rate_limit.personio_api_factory'
+
+    InspiredMinds\ContaoPersonio\Controller\ContentElement\PersonioJobApplicationController:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
 
     contao_personio.personio_authenticated_api_client:
         class: Symfony\Contracts\HttpClient\HttpClientInteface

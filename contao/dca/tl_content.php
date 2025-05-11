@@ -24,7 +24,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = [
 $GLOBALS['TL_DCA']['tl_content']['fields']['personio_applicationFields'] = [
     'exclude' => true,
     'inputType' => 'checkboxWizard',
-    'options' => array_merge(PersonioApi::$standardApplicationFields, PersonioApi::$systemApplicationAttributes),
+    'options' => [...PersonioApi::$standardApplicationFields, ...PersonioApi::$systemApplicationAttributes],
     'reference' => &$GLOBALS['TL_LANG']['MSC']['personioFields'],
     'eval' => ['multiple' => true],
     'sql' => ['type' => 'blob', 'length' => MySQLPlatform::LENGTH_LIMIT_BLOB, 'notnull' => false, 'default' => serialize(['first_name', 'last_name', 'email'])],
