@@ -6,8 +6,4 @@ full-time: Full time
 part-time: Part time
 full-or-part-time: Full or part time
 submit: Submit
-first_name: First name
-last_name: Last name
-email: Email
-message: Message
-file_cv: CV
+birthdayError: Birthday must be in the YYYY-MM-DD format.

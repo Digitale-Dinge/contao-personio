@@ -14,7 +14,9 @@ use Contao\ContentModel;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsContentElement;
 use Contao\PageModel;
+use Contao\StringUtil;
 use Contao\Template;
+use Contao\UploadableWidgetInterface;
 use Contao\Widget;
 use InspiredMinds\ContaoPersonio\Message\PersonioApplicationMessage;
 use InspiredMinds\ContaoPersonio\Model\Job;
@@ -24,7 +26,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Terminal42\FineUploaderBundle\Widget\FrontendWidget;
 
 #[AsContentElement(self::TYPE, template: 'ce_personio_job_application')]
 class PersonioJobApplicationController extends AbstractContentElementController
@@ -48,14 +49,27 @@ class PersonioJobApplicationController extends AbstractContentElementController
         $form = $this->buildForm($model, $request);
 
         if ($form->validate()) {
-            $data = $form->fetchAll(
-                function (string $name, Widget $widget): mixed {
-                    if ($widget instanceof FrontendWidget) {
+            $data = [];
+            $files = [];
+
+            $form->fetchAll(
+                function (string $name, Widget $widget) use (&$data, &$files): mixed {
+                    if ($widget instanceof UploadableWidgetInterface) {
+                        $files[$name] = $widget->value;
+
                         if (\is_array($widget->value)) {
-                            return array_map(fn (string $value): string => Path::join($this->projectDir, $value), (array) $widget->value);
+                            $files[$name] = array_map(fn (string $value): string => Path::join($this->projectDir, $value), (array) $widget->value);
+                        } else {
+                            $files[$name] = Path::join($this->projectDir, $widget->value);
                         }
 
-                        return Path::join($this->projectDir, $widget->value);
+                        return $widget->value;
+                    }
+
+                    if (\is_array($widget->value)) {
+                        $data[$name] = implode(',', $widget->value);
+                    } else {
+                        $data[$name] = $widget->value;
                     }
 
                     return $widget->value;
@@ -65,7 +79,7 @@ class PersonioJobApplicationController extends AbstractContentElementController
             $data['job_position_id'] = (int) $job->id;
             $data['application_date'] = (new \DateTimeImmutable())->format('Y-m-d');
 
-            $this->messageBus->dispatch(new PersonioApplicationMessage($data));
+            $this->messageBus->dispatch(new PersonioApplicationMessage($data, $files));
 
             if ($jumpTo = PageModel::findById($model->jumpTo)) {
                 return new RedirectResponse($jumpTo->getAbsoluteUrl());
@@ -79,46 +93,181 @@ class PersonioJobApplicationController extends AbstractContentElementController
 
     private function buildForm(ContentModel $model, Request $request): Form
     {
+        $fields = StringUtil::deserialize($model->personio_applicationFields, true);
+
         $form = new Form(
             'personio-job-application-'.$model->id,
             'POST',
             static fn (): bool => 'personio-job-application-'.$model->id === $request->request->get('FORM_SUBMIT'),
         );
 
-        $form->addFormField('first_name', [
-            'label' => $this->translator->trans('first_name', [], 'personio'),
-            'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 255],
-        ]);
+        $fileConfig = [
+            'multiple' => true,
+            'uploaderLimit' => 10,
+            'doNotOverwrite' => true,
+            'extensions' => 'pdf,pptx,xlsx,docx,doc,xls,ppt,ods,odt,7z,gz,rar,zip,bmp,gif,jpg,png,tif,csv,txt,rtf,mp4,3gp,mov,avi,wmv',
+            'maxlength' => 20971520,
+            'class' => 'widget-cv',
+        ];
 
-        $form->addFormField('last_name', [
-            'label' => $this->translator->trans('last_name', [], 'personio'),
-            'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 255],
-        ]);
-
-        $form->addFormField('email', [
-            'label' => $this->translator->trans('email', [], 'personio'),
-            'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'rgxp' => 'email', 'maxlength' => 255],
-        ]);
-
-        $form->addFormField('message', [
-            'label' => $this->translator->trans('message', [], 'personio'),
-            'inputType' => 'textarea',
-        ]);
-
-        $form->addFormField('file_cv', [
-            'label' => $this->translator->trans('file_cv', [], 'personio'),
-            'inputType' => 'fineUploader',
-            'eval' => [
-                'multiple' => true,
-                'uploaderLimit' => 10,
-                'doNotOverwrite' => true,
-                'extensions' => 'pdf,pptx,xlsx,docx,doc,xls,ppt,ods,odt,7z,gz,rar,zip,bmp,gif,jpg,png,tif,csv,txt,rtf,mp4,3gp,mov,avi,wmv',
-                'maxlength' => 20971520,
-            ],
-        ]);
+        foreach ($fields as $field) {
+            match ($field) {
+                // Standard fields
+                'first_name' => (
+                    function (Form $form): void {
+                        $form->addFormField('first_name', [
+                            'label' => $this->translator->trans('MSC.personioFields.first_name', [], 'contao_default'),
+                            'inputType' => 'text',
+                            'eval' => ['mandatory' => true, 'maxlength' => 255, 'class' => 'widget-first_name'],
+                        ]);
+                    }
+                )($form),
+                'last_name' => (
+                    function (Form $form): void {
+                        $form->addFormField('last_name', [
+                            'label' => $this->translator->trans('MSC.personioFields.last_name', [], 'contao_default'),
+                            'inputType' => 'text',
+                            'eval' => ['mandatory' => true, 'maxlength' => 255, 'class' => 'widget-last_name'],
+                        ]);
+                    }
+                )($form),
+                'email' => (
+                    function (Form $form): void {
+                        $form->addFormField('email', [
+                            'label' => $this->translator->trans('MSC.personioFields.email', [], 'contao_default'),
+                            'inputType' => 'text',
+                            'eval' => ['mandatory' => true, 'rgxp' => 'email', 'maxlength' => 255, 'class' => 'widget-email'],
+                        ]);
+                    }
+                )($form),
+                'message' => (
+                    function (Form $form): void {
+                        $form->addFormField('message', [
+                            'label' => $this->translator->trans('MSC.personioFields.message', [], 'contao_default'),
+                            'inputType' => 'textarea',
+                            'eval' => ['class' => 'widget-message', 'maxlength' => 255],
+                        ]);
+                    }
+                )($form),
+                // System attributes
+                'birthday' => (
+                    function (Form $form): void {
+                        $form->addFormField('birthday', [
+                            'label' => $this->translator->trans('MSC.personioFields.birthday', [], 'contao_default'),
+                            'inputType' => 'text',
+                            'eval' => ['rgxp' => 'custom', 'customRgxp' => '/^[0-9]{4}-[0-0]{2}-[0-0]{2}$/', 'class' => 'widget-birthday', 'errorMsg' => $this->translator->trans('birthdayError', [], 'personio'), 'maxlength' => 10],
+                        ]);
+                    }
+                )($form),
+                'gender' => (
+                    function (Form $form): void {
+                        $form->addFormField('gender', [
+                            'label' => $this->translator->trans('MSC.personioFields.gender', [], 'contao_default'),
+                            'inputType' => 'select',
+                            'options' => [
+                                'male',
+                                'female',
+                                'diverse',
+                                'undefined',
+                            ],
+                            'reference' => &$GLOBALS['TL_LANG']['MSC']['personioGenderOptions'],
+                            'eval' => ['class' => 'widget-gender', 'includeBlankOption' => true],
+                        ]);
+                    }
+                )($form),
+                'location' => (
+                    function (Form $form): void {
+                        $form->addFormField('location', [
+                            'label' => $this->translator->trans('MSC.personioFields.location', [], 'contao_default'),
+                            'inputType' => 'text',
+                            'eval' => ['class' => 'widget-location', 'maxlength' => 255],
+                        ]);
+                    }
+                )($form),
+                'phone' => (
+                    function (Form $form): void {
+                        $form->addFormField('phone', [
+                            'label' => $this->translator->trans('MSC.personioFields.phone', [], 'contao_default'),
+                            'inputType' => 'text',
+                            'eval' => ['class' => 'widget-phone', 'maxlength' => 255],
+                        ]);
+                    }
+                )($form),
+                'available_from' => (
+                    function (Form $form): void {
+                        $form->addFormField('available_from', [
+                            'label' => $this->translator->trans('MSC.personioFields.available_from', [], 'contao_default'),
+                            'inputType' => 'text',
+                            'eval' => ['class' => 'widget-available_from', 'maxlength' => 255],
+                        ]);
+                    }
+                )($form),
+                'salary_expectations' => (
+                    function (Form $form): void {
+                        $form->addFormField('salary_expectations', [
+                            'label' => $this->translator->trans('MSC.personioFields.salary_expectations', [], 'contao_default'),
+                            'inputType' => 'text',
+                            'eval' => ['class' => 'widget-salary_expectations', 'maxlength' => 255],
+                        ]);
+                    }
+                )($form),
+                // Files
+                'cv' => (
+                    function (Form $form, array $fileConfig): void {
+                        $form->addFormField('cv', [
+                            'label' => $this->translator->trans('MSC.personioFields.cv', [], 'contao_default'),
+                            'inputType' => 'fineUploader',
+                            'eval' => $fileConfig,
+                        ]);
+                    }
+                )($form, $fileConfig),
+                'cover-letter' => (
+                    function (Form $form, array $fileConfig): void {
+                        $form->addFormField('cover-letter', [
+                            'label' => $this->translator->trans('MSC.personioFields.cover-letter', [], 'contao_default'),
+                            'inputType' => 'fineUploader',
+                            'eval' => $fileConfig,
+                        ]);
+                    }
+                )($form, $fileConfig),
+                'employment-reference' => (
+                    function (Form $form, array $fileConfig): void {
+                        $form->addFormField('employment-reference', [
+                            'label' => $this->translator->trans('MSC.personioFields.employment-reference', [], 'contao_default'),
+                            'inputType' => 'fineUploader',
+                            'eval' => $fileConfig,
+                        ]);
+                    }
+                )($form, $fileConfig),
+                'certificate' => (
+                    function (Form $form, array $fileConfig): void {
+                        $form->addFormField('certificate', [
+                            'label' => $this->translator->trans('MSC.personioFields.certificate', [], 'contao_default'),
+                            'inputType' => 'fineUploader',
+                            'eval' => $fileConfig,
+                        ]);
+                    }
+                )($form, $fileConfig),
+                'work-sample' => (
+                    function (Form $form, array $fileConfig): void {
+                        $form->addFormField('work-sample', [
+                            'label' => $this->translator->trans('MSC.personioFields.work-sample', [], 'contao_default'),
+                            'inputType' => 'fineUploader',
+                            'eval' => $fileConfig,
+                        ]);
+                    }
+                )($form, $fileConfig),
+                'other' => (
+                    function (Form $form, array $fileConfig): void {
+                        $form->addFormField('other', [
+                            'label' => $this->translator->trans('MSC.personioFields.other', [], 'contao_default'),
+                            'inputType' => 'fineUploader',
+                            'eval' => $fileConfig,
+                        ]);
+                    }
+                )($form, $fileConfig),
+            };
+        }
 
         $form->addSubmitFormField($this->translator->trans('submit', [], 'personio'));
 

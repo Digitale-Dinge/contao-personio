@@ -8,3 +8,4 @@ declare(strict_types=1);
 
 $GLOBALS['TL_LANG']['tl_content']['config_legend'] = 'Element-Konfiguration';
 $GLOBALS['TL_LANG']['tl_content']['jumpTo'] = ['Weiterleitungsseite', 'Bitte wählen Sie die Seite aus, zu der Besucher beim Anklicken eines Links oder Abschicken eines Formulars weitergeleitet werden.'];
+$GLOBALS['TL_LANG']['tl_content']['personio_applicationFields'] = ['Bewerbungs-Felder', 'Wähle die Felder aus, die für das Bewerbungs-Formular sichtbar sein sollen.'];

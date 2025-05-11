@@ -17,6 +17,28 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class PersonioApi
 {
+    public static array $standardApplicationFields = [
+        'first_name',
+        'last_name',
+        'email',
+        'message',
+        'cv',
+        'cover-letter',
+        'employment-reference',
+        'certificate',
+        'work-sample',
+        'other',
+    ];
+
+    public static array $systemApplicationAttributes = [
+        'birthday',
+        'gender',
+        'location',
+        'phone',
+        'available_from',
+        'salary_expectations',
+    ];
+
     public function __construct(
         private readonly HttpClientInterface $personioAuthenticatedApiClient,
         private readonly RateLimiterFactory $personioApiRateLimiterFactory,

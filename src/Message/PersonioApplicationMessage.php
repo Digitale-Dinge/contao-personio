@@ -12,6 +12,7 @@ class PersonioApplicationMessage
 {
     public function __construct(
         public readonly array $data,
+        public readonly array $files,
     ) {
     }
 }
