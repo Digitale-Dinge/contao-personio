@@ -11,7 +11,9 @@ namespace InspiredMinds\ContaoPersonio\Controller\ContentElement;
 use Contao\ContentModel;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsContentElement;
+use Contao\PageModel;
 use Contao\Template;
+use InspiredMinds\ContaoPersonio\Controller\Page\PersonioJobPageController;
 use InspiredMinds\ContaoPersonio\Model\Job;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,6 +32,10 @@ class PersonioJobController extends AbstractContentElementController
         $template->setData(array_merge((array) $job, $template->getData()));
         $template->job = $job;
         $template->date = $job->createdAt->format($this->getPageModel()->datimFormat);
+
+        if (($jumpTo = PageModel::findById($model->jumpTo)) && PersonioJobPageController::TYPE === $jumpTo->type) {
+            $template->applyLink = $jumpTo->getFrontendUrl('/'.$job->id);
+        }
 
         return $template->getResponse();
     }

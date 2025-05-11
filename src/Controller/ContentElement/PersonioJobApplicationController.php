@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace InspiredMinds\ContaoPersonio\Controller\ContentElement;
 
-use Codefog\HasteBundle\FileUploadNormalizer;
 use Codefog\HasteBundle\Form\Form;
 use Contao\ContentModel;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
@@ -18,6 +17,7 @@ use Contao\StringUtil;
 use Contao\Template;
 use Contao\UploadableWidgetInterface;
 use Contao\Widget;
+use InspiredMinds\ContaoPersonio\Event\ModifyApplicationFormEvent;
 use InspiredMinds\ContaoPersonio\Message\PersonioApplicationMessage;
 use InspiredMinds\ContaoPersonio\Model\Job;
 use Symfony\Component\Filesystem\Path;
@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsContentElement(self::TYPE, template: 'ce_personio_job_application')]
@@ -35,7 +36,7 @@ class PersonioJobApplicationController extends AbstractContentElementController
     public function __construct(
         private readonly MessageBusInterface $messageBus,
         private readonly TranslatorInterface $translator,
-        private readonly FileUploadNormalizer $fileUploadNormalizer,
+        private readonly EventDispatcherInterface $eventDispatcher,
         private readonly string $projectDir,
     ) {
     }
@@ -270,6 +271,8 @@ class PersonioJobApplicationController extends AbstractContentElementController
         }
 
         $form->addSubmitFormField($this->translator->trans('submit', [], 'personio'));
+
+        $this->eventDispatcher->dispatch(new ModifyApplicationFormEvent($form, $model));
 
         return $form;
     }

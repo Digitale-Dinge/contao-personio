@@ -14,6 +14,7 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsContentElement;
 use Contao\CoreBundle\Util\LocaleUtil;
 use Contao\PageModel;
 use Contao\Template;
+use InspiredMinds\ContaoPersonio\Controller\Page\PersonioJobPageController;
 use InspiredMinds\ContaoPersonio\Model\Job;
 use InspiredMinds\ContaoPersonio\PersonioXml;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,7 +46,7 @@ class PersonioJobsController extends AbstractContentElementController
         }
 
         $template->getJobDetailUrl = static function (Job $job) use ($model): string|null {
-            if (!$job->id || !($jumpTo = PageModel::findById($model->jumpTo))) {
+            if (!($jumpTo = PageModel::findById($model->jumpTo)) || PersonioJobPageController::TYPE !== $jumpTo->type) {
                 return null;
             }
 

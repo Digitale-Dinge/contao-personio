@@ -14,7 +14,7 @@ use InspiredMinds\ContaoPersonio\Controller\Page\PersonioJobPageController;
 $GLOBALS['TL_LANG']['CTE'][PersonioJobsController::TYPE] = ['Personio jobs', 'Shows a list of jobs from Personio.'];
 $GLOBALS['TL_LANG']['CTE'][PersonioJobController::TYPE] = ['Personio job', 'Shows the details of a job from Personio.'];
 $GLOBALS['TL_LANG']['CTE'][PersonioJobApplicationController::TYPE] = ['Personio job application', 'Shows a form for applying to a job from Personio.'];
-$GLOBALS['TL_LANG']['PTY'][PersonioJobPageController::TYPE] = ['Personio Job', 'Detail page type for Personio jobs.'];
+$GLOBALS['TL_LANG']['PTY'][PersonioJobPageController::TYPE] = ['Personio job', 'Detail page type for Personio jobs.'];
 $GLOBALS['TL_LANG']['MSC']['personioFields'] = [
     'first_name' => 'First name',
     'last_name' => 'Last name',

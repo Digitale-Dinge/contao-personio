@@ -15,5 +15,8 @@
         <?php endforeach; ?>
       </div>
     <?php endif; ?>
+    <?php if ($this->applyLink): ?>
+      <p class="apply"><a href="<?= $this->applyLink ?>"><?= $this->trans('apply', [], 'personio') ?></a></p>
+    <?php endif; ?>
   </div>
 <?php $this->endblock(); ?>
