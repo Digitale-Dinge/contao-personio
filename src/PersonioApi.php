@@ -10,6 +10,9 @@ namespace InspiredMinds\ContaoPersonio;
 
 use InspiredMinds\ContaoPersonio\Exception\PersonioApiException;
 use InspiredMinds\ContaoPersonio\Exception\UnauthorizedException;
+use Symfony\Component\Mime\MimeTypesInterface;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -42,12 +45,20 @@ class PersonioApi
     public function __construct(
         private readonly HttpClientInterface $personioAuthenticatedApiClient,
         private readonly RateLimiterFactory $personioApiRateLimiterFactory,
+        private readonly MimeTypesInterface $mimeTypes,
     ) {
     }
 
     public function postApplicationDocument(string $filepath): array
     {
-        return $this->request('POST', 'recruiting/applications/documents', ['body' => ['file' => fopen($filepath, 'r')]])->toArray();
+        $file = new DataPart(fopen($filepath, 'r'), basename($filepath), $this->mimeTypes->guessMimeType($filepath));
+        $formData = new FormDataPart(['file' => $file]);
+        $options = [
+            'body' => $formData->bodyToString(),
+            'headers' => $formData->getPreparedHeaders()->toArray(),
+        ];
+
+        return $this->request('POST', 'recruiting/applications/documents', $options)->toArray();
     }
 
     public function postApplication(array $data): void
@@ -70,10 +81,20 @@ class PersonioApi
             $content = $response->getContent(false);
 
             if (401 === $response->getStatusCode()) {
-                throw new UnauthorizedException($content ?: 'Unauthorized - The API token and/or company id was not recognized.');
+                throw new UnauthorizedException($content ?: 'Unauthorized - The API token and/or company id was not recognized.', previous: $e);
             }
 
-            throw new PersonioApiException($content);
+            try {
+                $data = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+
+                if ($error = ($data['error']['reason'] ?? null)) {
+                    throw new PersonioApiException($error, previous: $e);
+                }
+            } catch (\JsonException) {
+                // noop
+            }
+
+            throw new PersonioApiException($content, previous: $e);
         }
     }
 }

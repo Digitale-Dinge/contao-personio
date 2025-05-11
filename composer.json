@@ -22,21 +22,22 @@
     ],
     "require": {
         "php": ">=8.1",
+        "codefog/contao-haste": "^5.2",
         "contao/core-bundle": "^4.13 || ^5.0",
         "phpdocumentor/reflection-docblock": "^5.3",
         "symfony/dependency-injection": "^5.4 || ^6.4 || ^7.1",
+        "symfony/filesystem": "^5.4 || ^6.4 || ^7.1",
         "symfony/framework-bundle": "^5.4 || ^6.4 || ^7.1",
         "symfony/http-client": "^5.4 || ^6.4 || ^7.1",
         "symfony/http-client-contracts": "^2.0 || ^3.0",
         "symfony/http-foundation": "^5.4 || ^6.4 || ^7.1",
         "symfony/http-kernel": "^5.4 || ^6.4 || ^7.1",
         "symfony/messenger": "^5.4 || ^6.4 || ^7.1",
+        "symfony/mime": "^5.4 || ^6.4 || ^7.1",
         "symfony/property-access": "^5.4 || ^6.4 || ^7.1",
         "symfony/property-info": "^5.4 || ^6.4 || ^7.1",
         "symfony/serializer": "^5.4 || ^6.4 || ^7.1",
-        "codefog/contao-haste": "^5.2",
-        "terminal42/contao-fineuploader": "^3.4",
-        "symfony/filesystem": "^5.4 || ^6.4 || ^7.1"
+        "terminal42/contao-fineuploader": "^3.4"
     },
     "autoload": {
         "psr-4": {
