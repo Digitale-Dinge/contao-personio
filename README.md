@@ -21,8 +21,8 @@ For the Recruiting API you will need to define the Company ID and the Recruiting
 ```yaml
 # config/config.yaml
 contao_personio:
-    company_id: …
-    recruiting_api_token: …
+    company_id: 123456
+    recruiting_api_token: your-token
 ```
 
 It is recommended to store the token as an environment variable:
@@ -34,7 +34,7 @@ PERSONIO_RECRUITING_API_TOKEN=
 
 ```
 # .env.local
-PERSONIO_RECRUITING_API_TOKEN=…
+PERSONIO_RECRUITING_API_TOKEN=your-token
 ```
 
 ```yaml
