@@ -107,4 +107,3 @@ Also keep in mind that the fields `first_name`, `last_name` and `email` are mand
 ## Acknowledgements
 
 Development funded by [Helmig + Weber Steuerberater](https://www.helmig-weber.de/).
-
