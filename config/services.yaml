@@ -16,6 +16,10 @@ services:
         arguments:
             $projectDir: '%kernel.project_dir%'
 
+    InspiredMinds\ContaoPersonio\HttpClient\PersonioAuthenticatedApiClientFactory:
+        arguments:
+            $personioApiRateLimiterFactory: '@contao_personio.rate_limit.personio_api_factory'
+
     contao_personio.personio_authenticated_api_client:
         class: Symfony\Contracts\HttpClient\HttpClientInteface
         factory: '@InspiredMinds\ContaoPersonio\HttpClient\PersonioAuthenticatedApiClientFactory'

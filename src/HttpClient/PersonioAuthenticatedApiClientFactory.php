@@ -8,12 +8,14 @@ declare(strict_types=1);
 
 namespace InspiredMinds\ContaoPersonio\HttpClient;
 
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class PersonioAuthenticatedApiClientFactory
 {
     public function __construct(
         private readonly HttpClientInterface $personioApiClient,
+        private readonly RateLimiterFactory $personioApiRateLimiterFactory,
         private readonly string $clientId,
         private readonly string $clientSecret,
     ) {
@@ -21,6 +23,11 @@ class PersonioAuthenticatedApiClientFactory
 
     public function __invoke(): HttpClientInterface
     {
+        $this->personioApiRateLimiterFactory->create('auth')
+            ->reserve()
+            ->wait()
+        ;
+
         $response = $this->personioApiClient
             ->request('POST', 'auth', ['json' => ['client_id' => $this->clientId, 'client_secret' => $this->clientSecret]])
             ->toArray()

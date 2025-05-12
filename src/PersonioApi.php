@@ -68,8 +68,10 @@ class PersonioApi
 
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
-        $limiter = $this->personioApiRateLimiterFactory->create(md5($url));
-        $limiter->reserve()->wait();
+        $this->personioApiRateLimiterFactory->create(md5($url))
+            ->reserve()
+            ->wait()
+        ;
 
         try {
             $response = $this->personioAuthenticatedApiClient->request($method, $url, $options);
