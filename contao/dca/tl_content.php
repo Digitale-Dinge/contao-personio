@@ -10,7 +10,7 @@ use Doctrine\DBAL\Platforms\MySQLPlatform;
 use InspiredMinds\ContaoPersonio\Controller\ContentElement\PersonioJobApplicationController;
 use InspiredMinds\ContaoPersonio\Controller\ContentElement\PersonioJobController;
 use InspiredMinds\ContaoPersonio\Controller\ContentElement\PersonioJobsController;
-use InspiredMinds\ContaoPersonio\PersonioApi;
+use InspiredMinds\ContaoPersonio\PersonioRecruitingApi;
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = [
     'exclude' => true,
@@ -24,7 +24,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = [
 $GLOBALS['TL_DCA']['tl_content']['fields']['personio_applicationFields'] = [
     'exclude' => true,
     'inputType' => 'checkboxWizard',
-    'options' => [...PersonioApi::$standardApplicationFields, ...PersonioApi::$systemApplicationAttributes],
+    'options' => [...PersonioRecruitingApi::$standardApplicationFields, ...PersonioRecruitingApi::$systemApplicationAttributes],
     'reference' => &$GLOBALS['TL_LANG']['MSC']['personioFields'],
     'eval' => ['multiple' => true],
     'sql' => ['type' => 'blob', 'length' => MySQLPlatform::LENGTH_LIMIT_BLOB, 'notnull' => false, 'default' => serialize(['first_name', 'last_name', 'email'])],

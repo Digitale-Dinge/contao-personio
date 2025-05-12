@@ -7,9 +7,9 @@ services:
         resource: ../src
         exclude: ../src/{ContaoManager,DependencyInjection,Entity,Message,ContaoPersonioBundle.php}
 
-    InspiredMinds\ContaoPersonio\PersonioApi:
+    InspiredMinds\ContaoPersonio\PersonioRecruitingApi:
         arguments:
-            $personioAuthenticatedApiClient: '@contao_personio.personio_authenticated_api_client'
+            $personioRecruitingApiClient: '@contao_personio.personio_recruiting_api_client'
             $personioRecruitingApiRateLimiterFactory: '@contao_personio.rate_limit.personio_recruiting_api_factory'
 
     InspiredMinds\ContaoPersonio\Controller\ContentElement\PersonioJobApplicationController:

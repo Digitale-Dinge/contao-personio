@@ -16,35 +16,31 @@ contao_personio:
     xml_feed: https://{YOUR_COMPANY}.jobs.personio.de/xml
 ```
 
-For the Recruiting API you will need to define the Company ID, Client ID, Client Secret:
+For the Recruiting API you will need to define the Company ID and the Recruiting API token:
 
 ```yaml
 # config/config.yaml
 contao_personio:
     company_id: …
-    recruiting_api_client_id: …
-    recruiting_api_client_secret: …
+    recruiting_api_token: …
 ```
 
-It is recommended to store the Client ID and Client Secret as environment variables:
+It is recommended to store the token as an environment variable:
 
 ```
 # .env
-PERSONIO_RECRUITING_API_CLIENT_ID=
-PERSONIO_RECRUITING_API_CLIENT_SECRET=
+PERSONIO_RECRUITING_API_TOKEN=
 ```
 
 ```
 # .env.local
-PERSONIO_RECRUITING_API_CLIENT_ID=…
-PERSONIO_RECRUITING_API_CLIENT_SECRET=…
+PERSONIO_RECRUITING_API_TOKEN=…
 ```
 
 ```yaml
 # config/config.yaml
 contao_personio:
-    recruiting_api_client_id: '%env(PERSONIO_RECRUITING_API_CLIENT_ID)%'
-    recruiting_api_client_secret: '%env(PERSONIO_RECRUITING_API_CLIENT_SECRET)%'
+    recruiting_api_token: '%env(PERSONIO_RECRUITING_API_TOKEN)%'
 ```
 
 ## Job List

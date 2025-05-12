@@ -13,7 +13,7 @@ use InspiredMinds\ContaoPersonio\Controller\ContentElement\PersonioJobsControlle
 use InspiredMinds\ContaoPersonio\Controller\Page\PersonioJobPageController;
 use InspiredMinds\ContaoPersonio\HttpClient\PersonioAuthenticatedApiClientFactory;
 use InspiredMinds\ContaoPersonio\MessageHandler\PersonioApplicationHandler;
-use InspiredMinds\ContaoPersonio\PersonioApi;
+use InspiredMinds\ContaoPersonio\PersonioRecruitingApi;
 use InspiredMinds\ContaoPersonio\PersonioXml;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -57,6 +57,7 @@ class ContaoPersonioExtension extends Extension
         }
 
         $companyId = $config['company_id'];
+        $recruitingApiToken = $config['recruiting_api_token'];
         $clientId = $config['recruiting_api_client_id'];
         $clientSecret = $config['recruiting_api_client_secret'];
         $apiUrl = $config['api_url'];
@@ -86,8 +87,28 @@ class ContaoPersonioExtension extends Extension
             ;
         } else {
             $container->removeDefinition(PersonioAuthenticatedApiClientFactory::class);
-            $container->removeDefinition(PersonioApi::class);
             $container->removeDefinition('contao_personio.personio_authenticated_api_client');
+        }
+
+        if ($companyId && $recruitingApiToken && $apiUrl) {
+            $options = [
+                'base_uri' => $apiUrl,
+                'auth_bearer' => $recruitingApiToken,
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'X-Personio-App-ID' => 'Contao Personio',
+                    'X-Company-ID' => $companyId,
+                ],
+            ];
+
+            $container
+                ->register('contao_personio.personio_recruiting_api_client', HttpClientInterface::class)
+                ->setFactory([new Reference('http_client'), 'withOptions'])
+                ->setArguments([$options])
+                ->addTag('http_client.client')
+            ;
+        } else {
+            $container->removeDefinition(PersonioRecruitingApi::class);
             $container->removeDefinition(PersonioJobApplicationController::class);
             $container->removeDefinition(PersonioApplicationHandler::class);
         }

@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace InspiredMinds\ContaoPersonio\MessageHandler;
 
 use InspiredMinds\ContaoPersonio\Message\PersonioApplicationMessage;
-use InspiredMinds\ContaoPersonio\PersonioApi;
+use InspiredMinds\ContaoPersonio\PersonioRecruitingApi;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 class PersonioApplicationHandler
 {
     public function __construct(
-        private readonly PersonioApi $personioApi,
+        private readonly PersonioRecruitingApi $personioRecruitingApi,
         private readonly Filesystem $filesystem,
     ) {
     }
@@ -27,7 +27,7 @@ class PersonioApplicationHandler
         $application = [];
 
         foreach ($message->data as $key => $value) {
-            if (\in_array($key, PersonioApi::$standardApplicationFields, true)) {
+            if (\in_array($key, PersonioRecruitingApi::$standardApplicationFields, true)) {
                 $application[$key] = $value;
             } else {
                 $application['attributes'] ??= [];
@@ -40,7 +40,7 @@ class PersonioApplicationHandler
 
         foreach ($message->files as $key => $value) {
             foreach ((array) $value as $filepath) {
-                $file = $this->personioApi->postApplicationDocument($filepath);
+                $file = $this->personioRecruitingApi->postApplicationDocument($filepath);
 
                 $this->filesystem->remove($filepath);
 
@@ -53,6 +53,6 @@ class PersonioApplicationHandler
             }
         }
 
-        $this->personioApi->postApplication($application);
+        $this->personioRecruitingApi->postApplication($application);
     }
 }
