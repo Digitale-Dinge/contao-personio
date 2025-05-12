@@ -10,7 +10,7 @@ services:
     InspiredMinds\ContaoPersonio\PersonioApi:
         arguments:
             $personioAuthenticatedApiClient: '@contao_personio.personio_authenticated_api_client'
-            $personioApiRateLimiterFactory: '@contao_personio.rate_limit.personio_api_factory'
+            $personioRecruitingApiRateLimiterFactory: '@contao_personio.rate_limit.personio_recruiting_api_factory'
 
     InspiredMinds\ContaoPersonio\Controller\ContentElement\PersonioJobApplicationController:
         arguments:
@@ -18,7 +18,7 @@ services:
 
     InspiredMinds\ContaoPersonio\HttpClient\PersonioAuthenticatedApiClientFactory:
         arguments:
-            $personioApiRateLimiterFactory: '@contao_personio.rate_limit.personio_api_factory'
+            $personioAuthApiRateLimiterFactory: '@contao_personio.rate_limit.personio_auth_api_factory'
 
     contao_personio.personio_authenticated_api_client:
         class: Symfony\Contracts\HttpClient\HttpClientInteface
@@ -29,7 +29,14 @@ services:
         arguments:
             - '@cache.rate_limiter'
 
-    contao_personio.rate_limit.personio_api_factory:
+    contao_personio.rate_limit.personio_auth_api_factory:
+        class: Symfony\Component\RateLimiter\RateLimiterFactory
+        arguments:
+            - { id: contao_personio.personio_api, policy: fixed_window, limit: 60, interval: 1 minute }
+            - '@contao_personio.rate_limit.personio_api_storage'
+            - '@?lock_factory'
+
+    contao_personio.rate_limit.personio_recruiting_api_factory:
         class: Symfony\Component\RateLimiter\RateLimiterFactory
         arguments:
             - { id: contao_personio.personio_api, policy: fixed_window, limit: 20, interval: 1 minute }

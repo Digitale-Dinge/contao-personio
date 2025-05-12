@@ -44,7 +44,7 @@ class PersonioApi
 
     public function __construct(
         private readonly HttpClientInterface $personioAuthenticatedApiClient,
-        private readonly RateLimiterFactory $personioApiRateLimiterFactory,
+        private readonly RateLimiterFactory $personioRecruitingApiRateLimiterFactory,
         private readonly MimeTypesInterface $mimeTypes,
     ) {
     }
@@ -68,7 +68,7 @@ class PersonioApi
 
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
-        $this->personioApiRateLimiterFactory->create(md5($url))
+        $this->personioRecruitingApiRateLimiterFactory->create(md5($url))
             ->reserve()
             ->wait()
         ;

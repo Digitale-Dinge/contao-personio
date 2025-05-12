@@ -15,7 +15,7 @@ class PersonioAuthenticatedApiClientFactory
 {
     public function __construct(
         private readonly HttpClientInterface $personioApiClient,
-        private readonly RateLimiterFactory $personioApiRateLimiterFactory,
+        private readonly RateLimiterFactory $personioAuthApiRateLimiterFactory,
         private readonly string $clientId,
         private readonly string $clientSecret,
     ) {
@@ -23,7 +23,7 @@ class PersonioAuthenticatedApiClientFactory
 
     public function __invoke(): HttpClientInterface
     {
-        $this->personioApiRateLimiterFactory->create('auth')
+        $this->personioAuthApiRateLimiterFactory->create('auth')
             ->reserve()
             ->wait()
         ;
