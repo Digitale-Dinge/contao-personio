@@ -50,11 +50,14 @@ class PersonioJobApplicationController extends AbstractContentElementController
         $form = $this->buildForm($model, $request);
 
         if ($form->validate()) {
-            $data = [];
             $files = [];
 
-            $form->fetchAll(
-                function (string $name, Widget $widget) use (&$data, &$files): mixed {
+            $data = $form->fetchAll(
+                function (string $name, Widget $widget) use (&$files): string|null {
+                    if (!$widget->submitInput()) {
+                        return null;
+                    }
+
                     if ($widget instanceof UploadableWidgetInterface) {
                         $files[$name] = $widget->value;
 
@@ -64,7 +67,7 @@ class PersonioJobApplicationController extends AbstractContentElementController
                             $files[$name] = Path::join($this->projectDir, $widget->value);
                         }
 
-                        return $widget->value;
+                        return null;
                     }
 
                     if (\is_array($widget->value)) {
@@ -85,6 +88,8 @@ class PersonioJobApplicationController extends AbstractContentElementController
             if ($jumpTo = PageModel::findById($model->jumpTo)) {
                 return new RedirectResponse($jumpTo->getAbsoluteUrl());
             }
+
+            return new RedirectResponse($request->getUri());
         }
 
         $template->form = $form->generate();

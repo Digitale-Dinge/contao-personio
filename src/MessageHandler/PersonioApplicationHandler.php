@@ -25,9 +25,10 @@ class PersonioApplicationHandler
     public function __invoke(PersonioApplicationMessage $message): void
     {
         $application = [];
+        $standardFields = [...PersonioRecruitingApi::$standardApplicationFields, ...PersonioRecruitingApi::$systemApplicationFields];
 
         foreach ($message->data as $key => $value) {
-            if (\in_array($key, PersonioRecruitingApi::$standardApplicationFields, true)) {
+            if (\in_array($key, $standardFields, true)) {
                 $application[$key] = $value;
             } else {
                 $application['attributes'] ??= [];
