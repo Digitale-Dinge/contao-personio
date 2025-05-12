@@ -18,12 +18,14 @@ use Contao\Template;
 use Contao\UploadableWidgetInterface;
 use Contao\Widget;
 use InspiredMinds\ContaoPersonio\Event\ModifyApplicationFormEvent;
+use InspiredMinds\ContaoPersonio\Exception\PersonioApiException;
 use InspiredMinds\ContaoPersonio\Message\PersonioApplicationMessage;
 use InspiredMinds\ContaoPersonio\Model\Job;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -37,6 +39,7 @@ class PersonioJobApplicationController extends AbstractContentElementController
         private readonly MessageBusInterface $messageBus,
         private readonly TranslatorInterface $translator,
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly KernelInterface $kernel,
         private readonly string $projectDir,
     ) {
     }
@@ -83,13 +86,35 @@ class PersonioJobApplicationController extends AbstractContentElementController
             $data['job_position_id'] = (int) $job->id;
             $data['application_date'] = (new \DateTimeImmutable())->format('Y-m-d');
 
-            $this->messageBus->dispatch(new PersonioApplicationMessage($data, $files));
+            try {
+                $this->messageBus->dispatch(new PersonioApplicationMessage($data, $files));
 
-            if ($jumpTo = PageModel::findById($model->jumpTo)) {
-                return new RedirectResponse($jumpTo->getAbsoluteUrl());
+                if ($jumpTo = PageModel::findById($model->jumpTo)) {
+                    return new RedirectResponse($jumpTo->getAbsoluteUrl());
+                }
+
+                return new RedirectResponse($request->getUri());
+            } catch (\Throwable $e) {
+                if ($this->kernel->isDebug()) {
+                    throw $e;
+                }
+
+                do {
+                    if ($e instanceof PersonioApiException) {
+                        if ($e->getMessage() !== ($translated = $this->translator->trans($e->getMessage(), [], 'personio'))) {
+                            $template->error = $translated;
+                        } else {
+                            $template->error = $this->translator->trans('ERR.general', [], 'contao_default');
+                        }
+
+                        break;
+                    }
+                } while ($e = $e->getPrevious());
+
+                if (!$template->error) {
+                    throw $e;
+                }
             }
-
-            return new RedirectResponse($request->getUri());
         }
 
         $template->form = $form->generate();

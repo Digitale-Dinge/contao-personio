@@ -1,5 +1,8 @@
 <?php $this->extend('block_unsearchable'); ?>
 
 <?php $this->block('content'); ?>
+  <?php if ($this->error): ?>
+    <p class="error"><?= $this->error ?></p>
+  <?php endif; ?>
   <?= $this->form ?>
 <?php $this->endblock(); ?>

@@ -8,3 +8,5 @@ full-or-part-time: Voll- oder Teilzeit
 submit: Senden
 birthdayError: Geburtstag muss das Format JJJJ-MM-TT haben.
 apply: Auf diese Stelle bewerben
+errors:
+    applicant-already-exists: Bewerber*in existiert bereits.

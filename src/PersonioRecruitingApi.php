@@ -97,6 +97,10 @@ class PersonioRecruitingApi
                 if ($error = ($data['error']['reason'] ?? null)) {
                     throw new PersonioApiException($error, previous: $e);
                 }
+
+                if ($error = ($data['errors'][0]['errors'][0]['reason'] ?? null)) {
+                    throw new PersonioApiException($error, previous: $e);
+                }
             } catch (\JsonException) {
                 // noop
             }

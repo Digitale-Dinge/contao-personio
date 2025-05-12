@@ -8,3 +8,5 @@ full-or-part-time: Full or part time
 submit: Submit
 birthdayError: Birthday must be in the YYYY-MM-DD format.
 apply: Apply for this job
+errors:
+    applicant-already-exists: Applicant already exists.

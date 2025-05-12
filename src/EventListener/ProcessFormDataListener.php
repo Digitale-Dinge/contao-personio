@@ -15,7 +15,9 @@ use InspiredMinds\ContaoPersonio\Exception\PersonioApiException;
 use InspiredMinds\ContaoPersonio\Message\PersonioApplicationMessage;
 use InspiredMinds\ContaoPersonio\Model\Job;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsHook('processFormData')]
 class ProcessFormDataListener
@@ -24,6 +26,8 @@ class ProcessFormDataListener
         private readonly MessageBusInterface $messageBus,
         private readonly RequestStack $requestStack,
         private readonly FileUploadNormalizer $fileUploadNormalizer,
+        private readonly TranslatorInterface $translator,
+        private readonly KernelInterface $kernel,
     ) {
     }
 
@@ -53,12 +57,18 @@ class ProcessFormDataListener
         try {
             $this->messageBus->dispatch(new PersonioApplicationMessage($submittedData, $applicationFiles));
         } catch (\Throwable $e) {
-            if (!method_exists($form, 'addError')) {
+            if (!method_exists($form, 'addError') || $this->kernel->isDebug()) {
                 throw $e;
             }
 
             do {
                 if ($e instanceof PersonioApiException) {
+                    if ($e->getMessage() !== ($translated = $this->translator->trans($e->getMessage(), [], 'personio'))) {
+                        $form->addError($translated);
+                    } else {
+                        $form->addError($this->translator->trans('ERR.general', [], 'contao_default'));
+                    }
+
                     $form->addError($e->getMessage());
 
                     return;
