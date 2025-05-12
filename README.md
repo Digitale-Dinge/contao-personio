@@ -106,3 +106,8 @@ Generator and activate the __Store in Personio__ setting. Within the form you ca
 names of the fields must match the names of the fields in the [API](https://developer.personio.de/v1.0/reference/post_v1-recruiting-applications#form-postV1RecruitingApplications). For file uploads the field name must match the
 category of the file in the API. Also keep in mind that the fields `first_name`, `last_name` and `email` are mandatory
 in the Personio API.
+
+## Acknowledgements
+
+Development funded by [Helmig + Weber Steuerberater](https://www.helmig-weber.de/).
+
