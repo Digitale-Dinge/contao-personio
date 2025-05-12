@@ -8,7 +8,7 @@ Personio API connection for Contao.
 
 ## Configuration
 
-For the job listings you first need to configure the public XML feed of the company's job listing:
+For the job listings you first need to configure the public XML feed of the company's job listings:
 
 ```yaml
 # config/config.yaml
