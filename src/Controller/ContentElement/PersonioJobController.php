@@ -11,6 +11,7 @@ namespace InspiredMinds\ContaoPersonio\Controller\ContentElement;
 use Contao\ContentModel;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsContentElement;
+use Contao\CoreBundle\Slug\Slug;
 use Contao\PageModel;
 use Contao\Template;
 use InspiredMinds\ContaoPersonio\Controller\Page\PersonioJobPageController;
@@ -23,6 +24,10 @@ class PersonioJobController extends AbstractContentElementController
 {
     public const TYPE = 'personio_job';
 
+    public function __construct(private readonly Slug $slug)
+    {
+    }
+
     protected function getResponse(Template $template, ContentModel $model, Request $request): Response
     {
         if (!($job = $request->attributes->get('_content')) instanceof Job) {
@@ -34,7 +39,7 @@ class PersonioJobController extends AbstractContentElementController
         $template->date = $job->createdAt->format($this->getPageModel()->datimFormat);
 
         if (($jumpTo = PageModel::findById($model->jumpTo)) && PersonioJobPageController::TYPE === $jumpTo->type) {
-            $template->applyLink = $jumpTo->getFrontendUrl('/'.$job->id);
+            $template->applyLink = $jumpTo->getFrontendUrl('/'.$this->slug->generate($job->name.' '.$job->id, $this->getPageModel()));
         }
 
         return $template->getResponse();
