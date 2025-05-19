@@ -73,7 +73,9 @@ namespace App\EventListener;
 
 use Codefog\HasteBundle\Util\ArrayPosition;
 use InspiredMinds\ContaoPersonio\Event\ModifyApplicationFormEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
+#[AsEventListener]
 class ModifyApplicationFormListener
 {
     public function __invoke(ModifyApplicationFormEvent $event): void
