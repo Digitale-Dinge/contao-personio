@@ -11,8 +11,9 @@ namespace InspiredMinds\ContaoPersonio\EventListener;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\StringUtil;
 
+#[AsCallback('tl_content', 'fields.personio_applicationFields.load')]
 #[AsCallback('tl_content', 'fields.personio_applicationFields.save')]
-class ApplicationFieldsSaveListener
+class ApplicationFieldsListener
 {
     private static $mandatoryFields = [
         'first_name',

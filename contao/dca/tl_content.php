@@ -27,7 +27,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['personio_applicationFields'] = [
     'options' => [...PersonioRecruitingApi::$standardApplicationFields, ...PersonioRecruitingApi::$systemApplicationAttributes],
     'reference' => &$GLOBALS['TL_LANG']['MSC']['personioFields'],
     'eval' => ['multiple' => true],
-    'sql' => ['type' => 'blob', 'length' => MySQLPlatform::LENGTH_LIMIT_BLOB, 'notnull' => false, 'default' => serialize(['first_name', 'last_name', 'email'])],
+    'sql' => ['type' => 'blob', 'length' => MySQLPlatform::LENGTH_LIMIT_BLOB, 'notnull' => false, 'notnull' => false],
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['palettes'][PersonioJobsController::TYPE] = '{type_legend},type,headline;{config_legend},jumpTo;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
