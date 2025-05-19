@@ -46,7 +46,7 @@ class PersonioJobPageController
 
         foreach ($jobs as $job) {
             /** @var Job $job */
-            if ($this->slug->generate($job->name.' '.$job->id, $pageModel) === $autoItem) {
+            if ($this->slug->generate($job->name.' '.$job->id, $pageModel->id) === $autoItem) {
                 $request->attributes->set('_content', $job);
 
                 break;

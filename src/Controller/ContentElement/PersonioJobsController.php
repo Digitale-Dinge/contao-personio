@@ -53,7 +53,7 @@ class PersonioJobsController extends AbstractContentElementController
                 return null;
             }
 
-            return $jumpTo->getFrontendUrl('/'.$this->slug->generate($job->name.' '.$job->id, $this->getPageModel()));
+            return $jumpTo->getFrontendUrl('/'.$this->slug->generate($job->name.' '.$job->id, $this->getPageModel()?->id ?? []));
         };
 
         return $template->getResponse();

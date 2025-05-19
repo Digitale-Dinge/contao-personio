@@ -39,7 +39,7 @@ class PersonioJobController extends AbstractContentElementController
         $template->date = $job->createdAt->format($this->getPageModel()->datimFormat);
 
         if (($jumpTo = PageModel::findById($model->jumpTo)) && PersonioJobPageController::TYPE === $jumpTo->type) {
-            $template->applyLink = $jumpTo->getFrontendUrl('/'.$this->slug->generate($job->name.' '.$job->id, $this->getPageModel()));
+            $template->applyLink = $jumpTo->getFrontendUrl('/'.$this->slug->generate($job->name.' '.$job->id, $this->getPageModel()?->id ?? []));
         }
 
         return $template->getResponse();
