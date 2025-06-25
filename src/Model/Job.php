@@ -18,7 +18,7 @@ class Job
         public string $id,
         public string $office,
         public string $department,
-        public string $recruitingCategory,
+        public string|null $recruitingCategory,
         public string $name,
         #[Context([EmptyArrayDenormalizer::class => JobDescriptions::class])]
         #[SerializedName('jobDescriptions')]
