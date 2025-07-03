@@ -17,6 +17,7 @@ use InspiredMinds\ContaoPersonio\PersonioRecruitingApi;
 use InspiredMinds\ContaoPersonio\PersonioXml;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -62,6 +63,10 @@ class ContaoPersonioExtension extends Extension
         $clientSecret = $config['recruiting_api_client_secret'];
         $apiUrl = $config['api_url'];
 
+        if (($clientId || $clientSecret) && !$companyId) {
+            throw new LogicException('Missing configuration for contao_personio.company_id.');
+        }
+
         if ($companyId && $clientId && $clientSecret && $apiUrl) {
             $options = [
                 'base_uri' => $apiUrl,
@@ -88,6 +93,10 @@ class ContaoPersonioExtension extends Extension
         } else {
             $container->removeDefinition(PersonioAuthenticatedApiClientFactory::class);
             $container->removeDefinition('contao_personio.personio_authenticated_api_client');
+        }
+
+        if ($recruitingApiToken && !$companyId) {
+            throw new LogicException('Missing configuration for contao_personio.company_id.');
         }
 
         if ($companyId && $recruitingApiToken && $apiUrl) {
