@@ -15,7 +15,7 @@ class Jobs
     public function __construct(
         /** @var list<Job> */
         #[SerializedName('position')]
-        public array $jobs,
+        public array $jobs = [],
     ) {
     }
 }
