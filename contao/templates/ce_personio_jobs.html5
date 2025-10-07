@@ -2,7 +2,7 @@
 
 <?php $this->block('content'); ?>
 	<?php	if (empty($this->jobs) || (is_object($this->jobs) && method_exists($this->jobs, 'count') && $this->jobs->count() === 0)) : ?>
-			<p><?= $this->trans('no-jobs-found', [], 'personio') ?></p>
+			<p><?= $this->trans('empty', [], 'personio') ?></p>
 	<?php else: ?>
 		<?php foreach ($this->jobs as $job): ?>
 			<div class="job job--list">
