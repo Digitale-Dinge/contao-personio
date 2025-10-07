@@ -1,7 +1,7 @@
 <?php $this->extend('block_unsearchable'); ?>
 
 <?php $this->block('content'); ?>
-	<?php	if (empty($this->jobs) || (is_object($this->jobs) && method_exists($this->jobs, 'count') && $this->jobs->count() === 0)) : ?>
+	<?php if (!$this->jobs): ?>
 			<p><?= $this->trans('empty', [], 'personio') ?></p>
 	<?php else: ?>
 		<?php foreach ($this->jobs as $job): ?>
