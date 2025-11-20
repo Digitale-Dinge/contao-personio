@@ -10,4 +10,4 @@ birthdayError: Data nașterii trebuie să aibă formatul AAAA-LL-ZZ.
 apply: Aplică pentru această poziție
 errors:
     applicant-already-exists: Candidatul există deja.
-no-jobs-found: În prezent nu există posturi vacante.
+empty: În prezent nu există posturi vacante.
