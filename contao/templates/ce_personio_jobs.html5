@@ -2,7 +2,7 @@
 
 <?php $this->block('content'); ?>
   <?php if (!$this->jobs): ?>
-    <p><?= $this->trans('empty', [], 'personio') ?></p>
+    <p class="empty"><?= $this->trans('empty', [], 'personio') ?></p>
   <?php else: ?>
     <?php foreach ($this->jobs as $job): ?>
       <div class="job job--list">
